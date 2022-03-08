@@ -15,17 +15,13 @@ class UserSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = UsersModel
-        fields = ['id', 'username', 'nickname', 'password', 'confirm_password', 'sms_code', 'mobile', 'email']
+        fields = ['id', 'username', 'nickname', 'password', 'confirm_password', 'role', 'rank', 'sms_code', 'mobile']
 
         extra_kwargs = {
-            'username': {
-                'min_length': 6,
-                'max_length': 36,
-            },
             'password': {
                 'write_only': True,
                 'min_length': 8,
-                'max_length': 36,
+                'max_length': 24,
             }
         }
 

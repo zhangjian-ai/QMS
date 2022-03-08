@@ -28,7 +28,7 @@ SECRET_KEY = '%^vl0_4g6o6i3)khwgl%wv0x%7ngwc1-sibq$un5k*%w59xvsg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -42,13 +42,19 @@ INSTALLED_APPS = [
 
     # 三方扩展
     'rest_framework',
+    'corsheaders',
 
     # 自定义
     'oauth',
     'users',
+    'source',
+    'cases'
 ]
 
 MIDDLEWARE = [
+    # 解决跨域的中间件
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -142,6 +148,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # 》》》》》》自定义配置《《《《《《《
+
+# 允许跨域
+CORS_ALLOW_CREDENTIALS = True
+
+# CORS添加跨域白名单
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+)
 
 # 指定用户模型类
 AUTH_USER_MODEL = 'users.UsersModel'

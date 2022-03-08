@@ -1,4 +1,5 @@
 from rest_framework_jwt import utils
+from .constants import *
 
 
 def create_jwt(user: object):
