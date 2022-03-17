@@ -14,3 +14,12 @@ export let smsCode = (mobile) => { return axios.get(`oauth/smsCode/${mobile}`) }
 
 // 获取岗位和职级信息
 export let getStaff = () => { return axios.get('source/staff') }
+
+// 获取协议信息
+export let getProto = () => { return axios.get('source/proto') }
+
+// 创建服务
+export let createService = data => { return axios.post('service', data) }
+
+// 查询服务列表
+export let getServiceList = data => { return axios.get('service', { params: data })}

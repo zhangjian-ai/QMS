@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'oauth',
     'users',
     'source',
-    'cases'
+    'case',
+    'service'
 ]
 
 MIDDLEWARE = [
@@ -93,7 +94,7 @@ DATABASES = {
         'HOST': '101.43.61.175',  # 数据库主机
         'PORT': 3300,  # 数据库端口
         'USER': 'root',  # 数据库用户名
-        'PASSWORD': 'zm_123456',  # 数据库用户密码
+        'PASSWORD': 'xzdmm3300',  # 数据库用户密码
         'NAME': 'QMS'  # 数据库名字
     }
 }
@@ -132,15 +133,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -179,7 +180,7 @@ REST_FRAMEWORK = {
     # ),
 
     # 分页类
-    # 'DEFAULT_PAGINATION_CLASS': 'backend.utils.pagination.SetPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'backend.utils.SetPagination',
 
 }
 

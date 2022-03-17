@@ -57,12 +57,13 @@ class UserSerializers(serializers.ModelSerializer):
 
         # 校验短信验证码
         redis_conn = get_redis_connection("default")
-        real_sms_code = redis_conn.get('sms_%s' % mobile).decode()
+        real_sms_code = redis_conn.get('sms_%s' % mobile)
+        redis_conn.delete('sms_%s' % mobile)
 
         if not real_sms_code:
             raise serializers.ValidationError("验证码已过期，请重新发送")
 
-        if real_sms_code != attrs.get("sms_code"):
+        if real_sms_code.decode() != attrs.get("sms_code"):
             raise serializers.ValidationError("验证码错误")
 
         return attrs

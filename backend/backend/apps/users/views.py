@@ -22,8 +22,8 @@ class UsersViews(APIView):
             serializer.save()
         except ValidationError as e:
             return Response({"msg": e.detail.__str__()}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response({'data': serializer.data, 'msg': '添加用户成功'}, status=status.HTTP_201_CREATED)
 
 
 class UsersLoginView(APIView):
@@ -58,9 +58,10 @@ class UsersLoginView(APIView):
 
             # 校验短信验证码
             redis_conn = get_redis_connection("default")
-            real_sms_code = redis_conn.get('sms_%s' % mobile).decode()
+            real_sms_code = redis_conn.get('sms_%s' % mobile)
+            redis_conn.delete('sms_%s' % mobile)
 
-            if not real_sms_code or code != real_sms_code:
+            if not real_sms_code or code != real_sms_code.decode():
                 return Response({"msg": "验证码错误或已过期"}, status=status.HTTP_400_BAD_REQUEST)
 
         if user:

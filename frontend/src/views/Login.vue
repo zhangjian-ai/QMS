@@ -58,17 +58,18 @@ export default {
     // 用户登录
     login(form) {
       userLogin(form).then(res => {
-        console.log(res.data);
+        this.$store.commit("storeToken", {
+          token: res.data.token,
+          nickname: res.data.nickname
+        });
+        this.$router.replace("/home");
       });
     },
-
     // 用户注册
     logon(form) {
       userLogon(form).then(res => {
-        if (res.status == 201) {
-          this.$message.success("恭喜！注册成功");
-          this.type = 1;
-        }
+        this.$message.success(res.data.msg);
+        this.type = 1;
       });
     }
   },

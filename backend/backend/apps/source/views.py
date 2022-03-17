@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from backend.utils import ROLE, STAFF_RANK, NAME, CULTURE
+from backend.utils import STAFF_ROLE, STAFF_RANK, NAME, CULTURE, API_PROTO
 
 
 class StaffView(APIView):
@@ -12,7 +12,7 @@ class StaffView(APIView):
 
     def get(self, request):
         return Response({
-            "role": ROLE,
+            "role": STAFF_ROLE,
             "rank": STAFF_RANK
         }, status=status.HTTP_200_OK)
 
@@ -27,3 +27,11 @@ class SystemView(APIView):
             "name": NAME,
             "culture": CULTURE
         }, status=status.HTTP_200_OK)
+
+
+class ProtocolView(APIView):
+    """
+    系统协议
+    """
+    def get(self, request):
+        return Response(API_PROTO, status=status.HTTP_200_OK)

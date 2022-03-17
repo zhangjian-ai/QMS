@@ -11,4 +11,5 @@ from .views import *
 urlpatterns = [
     path('source/staff', StaffView.as_view()),
     path('source/sysInfo', SystemView.as_view()),
+    path('source/proto', ProtocolView.as_view()),
 ]

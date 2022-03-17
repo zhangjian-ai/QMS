@@ -79,8 +79,8 @@ axios.interceptors.response.use(
 
       }
     }
-    // 返回接口返回的错误信息
-    // return Promise.reject(res)
+    // 驳回响应对象，不再继续向后走
+    return Promise.reject(res)
 
   });
 
