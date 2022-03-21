@@ -5,12 +5,14 @@ from rest_framework.views import APIView
 
 from .serializers import *
 from .models import *
+from backend.utils.permission import ServicePermission
 
 
 class ServiceView(APIView):
     """
     服务视图
     """
+    permission_classes = [ServicePermission, ]
 
     def get(self, request):
         """
@@ -37,7 +39,6 @@ class ServiceView(APIView):
 
         total = query_set.count()
         serializer = ServiceSerializer(instance=query_set[(page - 1) * size: page * size], many=True)
-
         return Response({'total': total, 'data': serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request):

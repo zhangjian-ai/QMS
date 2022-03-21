@@ -62,7 +62,7 @@ export default {
           token: res.data.token,
           nickname: res.data.nickname
         });
-        this.$router.replace("/home");
+        this.$router.replace("/service/serviceList");
       });
     },
     // 用户注册

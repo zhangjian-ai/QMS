@@ -12,6 +12,7 @@ class SmsCodeView(APIView):
     """
     验证码视图
     """
+    permission_classes = []
 
     def get(self, request, mobile):
         # 获取redis链接

@@ -4,14 +4,12 @@
     <a-layout-sider v-model="collapsed" :trigger="null" collapsible :collapsedWidth="0">
       <div class="logo"></div>
       <a-menu theme="dark" mode="inline" @click="changeView">
-        <a-sub-menu key="service">
+        <a-sub-menu v-for="sub_menu in menu" :key="sub_menu.key">
           <span slot="title">
-            <a-icon type="cloud-server" />
-            <span>服务管理</span>
+            <a-icon :type="sub_menu.icon" />
+            <span>{{ sub_menu.content }}</span>
           </span>
-          <a-menu-item key="serviceList">服务列表</a-menu-item>
-          <a-menu-item key="moduleList">模块列表</a-menu-item>
-          <a-menu-item key="apiList">接口列表</a-menu-item>
+          <a-menu-item  v-for="item in sub_menu.items" :key="item.key">{{ item.content }}</a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
@@ -53,16 +51,27 @@
   </a-layout>
 </template>
 <script>
+import { getMenu } from "@/api";
+
 export default {
   data() {
     return {
-      collapsed: false
+      // 是否隐藏侧边栏
+      collapsed: false,
+
+      // 菜单配置
+      menu: []
     };
   },
   methods: {
     changeView(item) {
       this.$router.push({ name: item.key });
     }
+  },
+  mounted() {
+    getMenu().then(res => {
+      this.menu = res.data;
+    });
   }
 };
 </script>

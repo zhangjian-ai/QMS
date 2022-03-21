@@ -3,23 +3,23 @@
     <!-- 搜索区域 -->
     <div id="search-scope">
       <!-- 搜索表单 -->
-      <a-form-model ref="searchForm" layout="inline">
-        <a-form-model-item label="服务名称">
+      <a-form-model ref="searchForm" layout="inline" :model="searchForm">
+        <a-form-model-item label="服务名称" prop="name">
           <a-input placeholder="精确匹配" v-model="searchForm.name"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="协议">
-          <a-select v-model="searchForm.protocol">
+        <a-form-model-item label="协议" prop="protocol">
+          <a-select placeholder="请选择" v-model="searchForm.protocol">
             <a-select-option v-for="item in protocols" :value="item[0]" :key="item[0]">{{ item[1] }}</a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="服务域名">
+        <a-form-model-item label="服务域名" prop="domain">
           <a-input placeholder="模糊匹配" v-model="searchForm.domain"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="端口号">
+        <a-form-model-item label="端口号" prop="port">
           <a-input placeholder="精确匹配" v-model="searchForm.port"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="是否可用">
-          <a-select v-model="searchForm.flag">
+        <a-form-model-item label="是否可用" prop="flag">
+          <a-select v-model="searchForm.flag" placeholder="请选择">
             <a-select-option :value="1">是</a-select-option>
             <a-select-option :value="0">否</a-select-option>
           </a-select>
@@ -28,7 +28,7 @@
       <!-- 操作按钮 -->
       <a-row id="button-scope">
         <a-col :span="12" style="text-align: left">
-          <a-button type="primary" @click="visible = true">创建服务</a-button>
+          <a-button type="primary" @click="() => { visible = true; isCreate = true}">创建服务</a-button>
         </a-col>
         <a-col :span="12" style="text-align: right">
           <a-button type="primary" @click="queryServices()">查询</a-button>
@@ -66,7 +66,7 @@
           </a-form-model-item>
           <a-form-model-item prop="port">
             <a-input v-model="serviceForm.port" placeholder="端口号">
-              <a-icon slot="prefix" type="fire" style="color:rgba(0,0,0,.25)" />
+              <a-icon slot="prefix" type="shrink" style="color:rgba(0,0,0,.25)" />
             </a-input>
           </a-form-model-item>
           <a-form-model-item prop="flag" required>
@@ -83,9 +83,7 @@
       <a-table
         :columns="columns"
         :data-source="serviceList"
-        bordered
         :rowKey="record => { return record.id } "
-        size="small"
         :pagination="pagination"
       >
         <template slot="action" slot-scope="record">
@@ -97,7 +95,7 @@
   </div>
 </template>
 <script>
-import { getProto, createService, getServiceList } from "@/api";
+import { getProto, createService, updateService, getServiceList } from "@/api";
 
 export default {
   data() {
@@ -106,9 +104,9 @@ export default {
       searchForm: {
         name: null,
         domain: null,
-        protocol: 0,
+        protocol: undefined,
         port: null,
-        flag: 1
+        flag: undefined // 下拉框初始值定义为undefined时，placeholder才会展示
       },
 
       // 可选协议
@@ -116,6 +114,7 @@ export default {
 
       // 创建任务弹窗
       visible: false,
+      isCreate: true,
       serviceForm: {
         name: null,
         domain: null,
@@ -131,19 +130,19 @@ export default {
           title: "ID",
           dataIndex: "id",
           align: "center",
-          width: "5%"
+          width: "10%"
         },
         {
           title: "名称",
           dataIndex: "name",
           align: "center",
-          width: "15%"
+          width: "20%"
         },
         {
           title: "协议",
           dataIndex: "protocol_str",
           align: "center",
-          width: "15%"
+          width: "10%"
         },
 
         {
@@ -156,7 +155,7 @@ export default {
           title: "端口",
           dataIndex: "port",
           align: "center",
-          width: "15%"
+          width: "10%"
         },
         {
           title: "状态",
@@ -191,12 +190,27 @@ export default {
     handleOk() {
       this.$refs.serviceForm.validate(valid => {
         if (valid) {
-          createService(this.serviceForm).then(res => {
-            this.$message.success(res.data.msg);
-            this.visible = false;
-            this.$refs.serviceForm.resetFields();
-            this.queryServices();
-          });
+          if (this.isCreate) {
+            createService(this.serviceForm).then(res => {
+              this.$message.success(res.data.msg);
+              this.visible = false;
+              this.$refs.serviceForm.resetFields();
+              this.queryServices();
+            });
+          } else {
+            updateService(this.serviceForm).then(res => {
+              this.$message.success(res.data.msg);
+              this.visible = false;
+              this.serviceForm = {
+                name: null,
+                domain: null,
+                protocol: 0,
+                port: null,
+                flag: 1
+              };
+              this.queryServices();
+            });
+          }
         }
       });
     },
@@ -216,7 +230,9 @@ export default {
     },
     // 更新服务
     updateService(row) {
-      console.log(row);
+      this.visible = true;
+      this.isCreate = false;
+      this.serviceForm = JSON.parse(JSON.stringify(row));
     },
     // 分页回调
     onPage(current, pageSize) {
@@ -235,13 +251,10 @@ export default {
 </script>
 <style scoped>
 #search-scope {
-  padding: 0.5em 1em;
+  padding: 0.5em 0.5em;
   margin: 0.5em;
   background-color: lightgrey;
-}
-#list-scope {
-  margin: 0.5em;
-  overflow: auto;
+  border-radius: 0.3em;
 }
 .ant-form-inline .ant-form-item {
   width: 20em;
@@ -261,5 +274,18 @@ export default {
 #modal >>> .ant-select,
 #modal >>> .ant-input {
   width: 20em;
+}
+
+#list-scope {
+  margin: 0.5em;
+  overflow: auto;
+}
+#list-scope >>> .ant-table-thead > tr > th {
+  padding: 0.8em;
+  color: white;
+  background-color: lightslategrey;
+}
+#list-scope >>> .ant-table-tbody > tr > td {
+  padding: 0.4em;
 }
 </style>

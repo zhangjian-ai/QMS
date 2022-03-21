@@ -12,4 +12,5 @@ urlpatterns = [
     path('source/staff', StaffView.as_view()),
     path('source/sysInfo', SystemView.as_view()),
     path('source/proto', ProtocolView.as_view()),
+    path('source/menu', MenuView.as_view()),
 ]

@@ -7,9 +7,10 @@
 from rest_framework import serializers
 
 from .models import ServiceModel
+from backend.utils import BaseModelSerializer
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class ServiceSerializer(BaseModelSerializer):
     """
     服务序列化器
     """

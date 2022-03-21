@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 
 import Ant from 'ant-design-vue';
-import { Modal, message } from 'ant-design-vue'
+import { notification, message } from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css';
 
 import axios from 'axios'
@@ -28,7 +28,21 @@ axios.defaults.withCredentials = true
 Vue.config.productionTip = false
 
 
-// http response 拦截器
+// http request 拦截
+axios.interceptors.request.use(
+  config => {
+      // 添加token
+      if (store.state.token) {
+          // 判断是否存在token，如果存在的话，则每个http header都加上token。本项目使用JWT
+          config.headers.Authorization = `JWT ${store.state.token}`;
+      }
+      return config;
+  },
+  err => {
+      return Promise.reject(err);
+  });
+
+// http response 拦截
 axios.interceptors.response.use(
   response => {
     return response;
@@ -38,21 +52,18 @@ axios.interceptors.response.use(
     if (res) {
       switch (res.status) {
         case 401:
-          Modal.confirm(
+          notification.error(
             {
-              content: '账户认证信息已失效，请重新登录。',
-              title: '系统提示',
-              onOk() {
-                // 返回 401 清除token信息并跳转到登录页面
-                store.commit('setStatus');
-                router.replace('/');
-              },
-              onCancel() {
-                store.commit('setStatus');
-                router.go(0);  // 刷新一下当前页面
-              }
+              message: '系统提示',
+              description:
+                '登录信息已过期，请重新登录。',
+              duration: 3,
             }
-          )
+          );
+          setTimeout(() => {
+            router.replace('/login');
+          }, 1500)
+
           break;
         case 400:
           message.error(res.data.msg || '客户端错误')

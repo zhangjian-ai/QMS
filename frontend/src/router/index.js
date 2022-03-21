@@ -27,9 +27,9 @@ const routes = [
     component: () => import('../views/Home.vue'),
     children: [
       {
-        path: "service/serviceList",
+        path: "system/serviceList",
         name: "serviceList",
-        component: () => import('../components/home/service/serviceList.vue'),
+        component: () => import('../components/home/system/serviceList.vue'),
         meta: {
           title: "服务",
           auth: true

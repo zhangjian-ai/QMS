@@ -13,6 +13,8 @@ class UsersViews(APIView):
     """
     用户视图
     """
+    permission_classes = []
+    authentication_classes = []
 
     def post(self, request):
         data = request.data
@@ -30,6 +32,8 @@ class UsersLoginView(APIView):
     """
     用户登陆视图
     """
+    permission_classes = []
+    authentication_classes = []
 
     def post(self, request):
         user = None

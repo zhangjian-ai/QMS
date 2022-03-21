@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import datetime
 import os
 import sys
 from pathlib import Path
@@ -53,6 +54,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # 自定义中间件
+    'backend.utils.FormatBooleanMiddleware',
+
     # 解决跨域的中间件
     'corsheaders.middleware.CorsMiddleware',
 
@@ -175,12 +179,18 @@ REST_FRAMEWORK = {
     ),
 
     # 默认全局权限认证。不需要权限的视图中加入 permissions_class = [] 即可
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 
     # 分页类
     # 'DEFAULT_PAGINATION_CLASS': 'backend.utils.SetPagination',
 
+}
+
+# JWT 认证配置
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=3),
+    'JWT_ALLOW_REFRESH': True
 }
 

@@ -1,6 +1,7 @@
 from rest_framework_jwt import utils
 from .constants import *
-from .model import BaseModel
+from .middleware import *
+from .base import *
 from .pagination import SetPagination
 
 

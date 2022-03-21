@@ -12,10 +12,15 @@ export default new Vuex.Store({
   mutations: {
     // 保存token
     storeToken(state, payload) {
-      state.token = payload.token
-      state.nickname = payload.nickname
-      localStorage.token = payload.token
-      localStorage.nickname = payload.nickname
+      if (payload) {
+        state.token = localStorage.token = payload.token
+        state.nickname = localStorage.nickname = payload.nickname
+      } else {
+        state.token = ""
+        state.nickname = ""
+        localStorage.clear()
+      }
+
     }
   },
   actions: {

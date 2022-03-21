@@ -11,6 +11,20 @@ NAME = "QMS"
 # 企业文化
 CULTURE = "激情 创新 协作 高效"
 
+# 主页菜单
+MENU = [
+    {
+        'key': 'system',
+        'icon': 'cloud-server',
+        'content': '系统管理',
+        'items': [
+            {'key': 'serviceList', 'content': '服务管理'},
+            {'key': 'moduleList', 'content': '模块管理'},
+            {'key': 'apiList', 'content': '接口管理'}
+        ]
+    }
+]
+
 # 短信验证码有效时间(s)
 SMS_CODE_EXPIRES = 300
 
