@@ -56,7 +56,7 @@
             </a-input>
           </a-form-model-item>
           <a-form-model-item prop="protocol" required>
-            <a-select placeholder="请选择" v-model="serviceForm.protocol">
+            <a-select placeholder="协议类型" v-model="serviceForm.protocol">
               <a-select-option
                 v-for="item in protocols"
                 :value="item[0]"
@@ -70,9 +70,9 @@
             </a-input>
           </a-form-model-item>
           <a-form-model-item prop="flag" required>
-            <a-select v-model="serviceForm.flag">
-              <a-select-option :value="1">是</a-select-option>
-              <a-select-option :value="0">否</a-select-option>
+            <a-select placeholder="启用状态" v-model="serviceForm.flag">
+              <a-select-option :value="1">启用</a-select-option>
+              <a-select-option :value="0">禁用</a-select-option>
             </a-select>
           </a-form-model-item>
         </a-form-model>
@@ -81,6 +81,7 @@
     <!-- 表格区域 -->
     <div id="list-scope">
       <a-table
+        :loading="loading"
         :columns="columns"
         :data-source="serviceList"
         :rowKey="record => { return record.id } "
@@ -89,14 +90,14 @@
         <template slot="action" slot-scope="record">
           <a-button shape="circle" icon="edit" @click="updateService(record)" />
         </template>
-        <template slot="flag" slot-scope="text">{{ text == true ? "可用" : "不可用" }}</template>
+        <template slot="flag" slot-scope="text">{{ text == true ? "启用" : "禁用" }}</template>
       </a-table>
     </div>
   </div>
 </template>
 <script>
 import { getProto, createService, updateService, getServiceList } from "@/api";
-
+import { pagination } from "@/components/base";
 export default {
   data() {
     return {
@@ -118,12 +119,13 @@ export default {
       serviceForm: {
         name: null,
         domain: null,
-        protocol: 0,
+        protocol: undefined,
         port: null,
-        flag: 1
+        flag: undefined
       },
 
       // 表格
+      loading: false,
       serviceList: [],
       columns: [
         {
@@ -172,17 +174,7 @@ export default {
       ],
 
       // 分页
-      pagination: {
-        total: 0,
-        current: 1,
-        pageSize: 10,
-        showTotal: total => `共 ${total} 条数据`,
-        showSizeChanger: true,
-        showLessItems: true,
-        pageSizeOptions: ["10", "20", "50", "100"],
-        onShowSizeChange: this.onPage,
-        onChange: this.onPage
-      }
+      pagination: pagination(this.queryServices, ["5", "10", "20"])
     };
   },
   methods: {
@@ -204,9 +196,9 @@ export default {
               this.serviceForm = {
                 name: null,
                 domain: null,
-                protocol: 0,
+                protocol: undefined,
                 port: null,
-                flag: 1
+                flag: undefined
               };
               this.queryServices();
             });
@@ -221,11 +213,13 @@ export default {
     },
     // 查询服务列表
     queryServices() {
+      this.loading = true;
       this.searchForm.page = this.pagination.current;
       this.searchForm.page_size = this.pagination.pageSize;
       getServiceList(this.searchForm).then(res => {
         this.serviceList = res.data.data;
         this.pagination.total = res.data.total;
+        this.loading = false;
       });
     },
     // 更新服务
@@ -233,15 +227,9 @@ export default {
       this.visible = true;
       this.isCreate = false;
       this.serviceForm = JSON.parse(JSON.stringify(row));
-    },
-    // 分页回调
-    onPage(current, pageSize) {
-      this.pagination.current = current;
-      this.pagination.pageSize = pageSize;
-      this.queryServices();
     }
   },
-  mounted() {
+  created() {
     getProto().then(res => {
       this.protocols = res.data;
     });
