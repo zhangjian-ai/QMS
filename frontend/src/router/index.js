@@ -25,14 +25,25 @@ const routes = [
     path: "/",
     name: "Home",
     component: () => import('../views/Home.vue'),
+    meta: {
+      auth: true,
+      title: "主页"
+    },
     children: [
       {
-        path: "system/serviceList",
+        path: "serviceList",
         name: "serviceList",
         component: () => import('../components/home/system/serviceList.vue'),
         meta: {
-          title: "服务",
-          auth: true
+          title: "服务"
+        }
+      },
+      {
+        path: "moduleList",
+        name: "moduleList",
+        component: () => import('../components/home/system/moduleList.vue'),
+        meta: {
+          title: "模块"
         }
       }
     ]

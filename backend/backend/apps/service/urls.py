@@ -10,4 +10,6 @@ from .views import *
 
 urlpatterns = [
     path('service', ServiceView.as_view()),
+    path('allService', AllServiceView.as_view()),
+    path('module', ModuleView.as_view()),
 ]

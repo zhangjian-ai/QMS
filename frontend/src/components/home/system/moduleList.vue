@@ -4,28 +4,28 @@
     <div id="search-scope">
       <!-- 搜索表单 -->
       <a-form-model ref="searchForm" layout="inline" :model="searchForm">
-        <a-form-model-item label="服务名称" prop="name">
+        <a-form-model-item label="模块名称" prop="name">
           <a-input placeholder="精确匹配" v-model="searchForm.name"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="协议" prop="protocol">
+        <a-form-model-item label="自动化类名" prop="cls_name">
+          <a-input
+            placeholder="模糊匹配"
+            v-model="searchForm.cls_name"
+          ></a-input>
+        </a-form-model-item>
+        <a-form-model-item label="归属服务" prop="service">
           <a-select
             placeholder="请选择"
-            v-model="searchForm.protocol"
+            v-model="searchForm.service"
             allowClear
           >
             <a-select-option
-              v-for="item in protocols"
-              :value="item[0]"
-              :key="item[0]"
-              >{{ item[1] }}</a-select-option
+              v-for="item in services"
+              :value="item.id"
+              :key="item.id"
+              >{{ item.name }}</a-select-option
             >
           </a-select>
-        </a-form-model-item>
-        <a-form-model-item label="服务域名" prop="domain">
-          <a-input placeholder="模糊匹配" v-model="searchForm.domain"></a-input>
-        </a-form-model-item>
-        <a-form-model-item label="端口号" prop="port">
-          <a-input placeholder="精确匹配" v-model="searchForm.port"></a-input>
         </a-form-model-item>
         <a-form-model-item label="是否可用" prop="flag">
           <a-select v-model="searchForm.flag" placeholder="请选择" allowClear>
@@ -45,67 +45,58 @@
                 isCreate = true;
               }
             "
-            >创建服务</a-button
+            >创建模块</a-button
           >
         </a-col>
         <a-col :span="12" style="text-align: right">
-          <a-button type="primary" @click="queryServices()">查询</a-button>
+          <a-button type="primary" @click="queryModules()">查询</a-button>
           <a-button @click="$refs.searchForm.resetFields()">重置</a-button>
         </a-col>
       </a-row>
-      <!-- 创建服务弹窗 -->
+      <!-- 创建模块弹窗 -->
       <a-modal
         id="modal"
-        title="创建服务"
+        title="创建模块"
         :visible="visible"
         @ok="handleOk"
         @cancel="handleCancel"
         width="30em"
       >
         <a-form-model
-          ref="serviceForm"
-          :model="serviceForm"
+          ref="moduleForm"
+          :model="moduleForm"
           :wrapperCol="{ span: 18, offset: 3 }"
         >
           <a-form-model-item prop="name" required>
-            <a-input v-model="serviceForm.name" placeholder="服务名称">
+            <a-input v-model="moduleForm.name" placeholder="模块名称">
               <a-icon
                 slot="prefix"
-                type="cloud"
+                type="medium"
                 style="color: rgba(0, 0, 0, 0.25)"
               />
             </a-input>
           </a-form-model-item>
-          <a-form-model-item prop="domain" required>
-            <a-input v-model="serviceForm.domain" placeholder="域名">
+          <a-form-model-item prop="cls_name" required>
+            <a-input v-model="moduleForm.cls_name" placeholder="自动化类名">
               <a-icon
                 slot="prefix"
-                type="fire"
+                type="block"
                 style="color: rgba(0, 0, 0, 0.25)"
               />
             </a-input>
           </a-form-model-item>
-          <a-form-model-item prop="protocol" required>
-            <a-select placeholder="协议类型" v-model="serviceForm.protocol">
+          <a-form-model-item prop="service" required>
+            <a-select placeholder="归属服务" v-model="moduleForm.service">
               <a-select-option
-                v-for="item in protocols"
-                :value="item[0]"
-                :key="item[0]"
-                >{{ item[1] }}</a-select-option
+                v-for="item in services"
+                :value="item.id"
+                :key="item.id"
+                >{{ item.name }}</a-select-option
               >
             </a-select>
           </a-form-model-item>
-          <a-form-model-item prop="port">
-            <a-input v-model="serviceForm.port" placeholder="端口号">
-              <a-icon
-                slot="prefix"
-                type="shrink"
-                style="color: rgba(0, 0, 0, 0.25)"
-              />
-            </a-input>
-          </a-form-model-item>
           <a-form-model-item prop="flag" required>
-            <a-select placeholder="启用状态" v-model="serviceForm.flag">
+            <a-select placeholder="启用状态" v-model="moduleForm.flag">
               <a-select-option :value="1">启用</a-select-option>
               <a-select-option :value="0">禁用</a-select-option>
             </a-select>
@@ -114,7 +105,7 @@
       </a-modal>
       <!-- 删除服务弹窗 -->
       <a-modal
-        title="删除服务"
+        title="删除模块"
         :visible="delete_visible"
         @ok="handleDeleteOk"
         @cancel="delete_visible = false"
@@ -128,7 +119,7 @@
       <a-table
         :loading="loading"
         :columns="columns"
-        :data-source="serviceList"
+        :data-source="moduleList"
         :rowKey="
           (record) => {
             return record.id;
@@ -137,7 +128,7 @@
         :pagination="pagination"
       >
         <template slot="action" slot-scope="record">
-          <a-button shape="circle" icon="edit" @click="updateService(record)" />
+          <a-button shape="circle" icon="edit" @click="updateModule(record)" />
           <a-button
             shape="circle"
             icon="delete"
@@ -146,7 +137,7 @@
             @click="
               () => {
                 delete_visible = true;
-                service_id = record.id;
+                module_id = record.id;
               }
             "
           />
@@ -160,11 +151,11 @@
 </template>
 <script>
 import {
-  getProto,
-  createService,
-  updateService,
-  deleteService,
-  getServiceList,
+  getAllService,
+  getModuleList,
+  createModule,
+  updateModule,
+  deleteModule,
 } from "@/api";
 import { pagination } from "@/components/base";
 export default {
@@ -173,29 +164,27 @@ export default {
       // 查询表单
       searchForm: {
         name: null,
-        domain: null,
-        protocol: undefined,
-        port: null,
-        flag: undefined, // 下拉框初始值定义为undefined时，placeholder才会展示
+        cls_name: null,
+        service: undefined,
+        flag: undefined,
       },
 
-      // 可选协议
-      protocols: [],
+      // 可选服务
+      services: [],
 
-      // 创建任务弹窗
+      // 创建模块弹窗
       visible: false,
       isCreate: true,
-      serviceForm: {
+      moduleForm: {
         name: null,
-        domain: null,
-        protocol: undefined,
-        port: null,
+        cls_name: null,
+        service: undefined,
         flag: undefined,
       },
 
       // 表格
       loading: false,
-      serviceList: [],
+      moduleList: [],
       columns: [
         {
           title: "ID",
@@ -210,30 +199,29 @@ export default {
           width: "15%",
         },
         {
-          title: "协议",
-          dataIndex: "protocol_str",
+          title: "自动化类名",
+          dataIndex: "cls_name",
           align: "center",
-          width: "5%",
-        },
-
-        {
-          title: "域名",
-          dataIndex: "domain",
-          align: "center",
-          width: "25%",
+          width: "15%",
         },
         {
-          title: "端口",
-          dataIndex: "port",
+          title: "归属服务",
+          dataIndex: "service_name",
           align: "center",
-          width: "10%",
+          width: "15%",
         },
         {
           title: "状态",
           dataIndex: "flag",
           scopedSlots: { customRender: "flag" },
           align: "center",
-          width: "10%",
+          width: "5%",
+        },
+        {
+          title: "创建人",
+          dataIndex: "creator_name",
+          align: "center",
+          width: "15%",
         },
         {
           title: "创建时间",
@@ -249,37 +237,36 @@ export default {
       ],
 
       // 分页
-      pagination: pagination(this.queryServices, ["15", "30", "50"]),
+      pagination: pagination(this.queryServices, ["20", "50", "100"]),
 
       // 删除任务变量
       delete_visible: false,
-      service_id: null,
+      module_id: null,
     };
   },
   methods: {
     // 弹窗确认回调
     handleOk() {
-      this.$refs.serviceForm.validate((valid) => {
+      this.$refs.moduleForm.validate((valid) => {
         if (valid) {
           if (this.isCreate) {
-            createService(this.serviceForm).then((res) => {
+            createModule(this.moduleForm).then((res) => {
               this.$message.success(res.data.msg);
               this.visible = false;
-              this.$refs.serviceForm.resetFields();
-              this.queryServices();
+              this.$refs.moduleForm.resetFields();
+              this.queryModules();
             });
           } else {
-            updateService(this.serviceForm).then((res) => {
+            updateModule(this.moduleForm).then((res) => {
               this.$message.success(res.data.msg);
               this.visible = false;
-              this.serviceForm = {
+              this.moduleForm = {
                 name: null,
-                domain: null,
-                protocol: undefined,
-                port: null,
+                cls_name: null,
+                service: undefined,
                 flag: undefined,
               };
-              this.queryServices();
+              this.queryModules();
             });
           }
         }
@@ -288,39 +275,39 @@ export default {
     // 弹窗取消回调
     handleCancel() {
       this.visible = false;
-      this.$refs.serviceForm.resetFields();
+      this.$refs.moduleForm.resetFields();
     },
-    // 查询服务列表
-    queryServices() {
+    // 查询模块列表
+    queryModules() {
       this.loading = true;
       this.searchForm.page = this.pagination.current;
       this.searchForm.page_size = this.pagination.pageSize;
-      getServiceList(this.searchForm).then((res) => {
-        this.serviceList = res.data.data;
+      getModuleList(this.searchForm).then((res) => {
+        this.moduleList = res.data.data;
         this.pagination.total = res.data.total;
         this.loading = false;
       });
     },
-    // 更新服务
-    updateService(row) {
+    // 更新模块
+    updateModule(row) {
       this.visible = true;
       this.isCreate = false;
-      this.serviceForm = JSON.parse(JSON.stringify(row));
+      this.moduleForm = JSON.parse(JSON.stringify(row));
     },
-    // 删除服务
+    // 删除模块
     handleDeleteOk() {
-      deleteService(this.service_id).then((res) => {
+      deleteModule(this.module_id).then((res) => {
         this.$message.success(res.data.msg);
-        this.queryServices();
+        this.queryModules();
       });
       this.delete_visible = false;
     },
   },
   created() {
-    getProto().then((res) => {
-      this.protocols = res.data;
+    getAllService().then((res) => {
+      this.services = res.data;
     });
-    this.queryServices();
+    this.queryModules();
   },
 };
 </script>

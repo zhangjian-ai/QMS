@@ -27,5 +27,23 @@ export let createService = data => { return axios.post('service', data) }
 // 更新服务
 export let updateService = data => { return axios.put('service', data) }
 
+// 删除服务
+export let deleteService = id => { return axios.delete('service', { data: { id: id } }) }
+
 // 查询服务列表
 export let getServiceList = data => { return axios.get('service', { params: data }) }
+
+// 获取所有服务
+export let getAllService = () => { return axios.get('allService') }
+
+// 创建模块
+export let createModule = data => { return axios.post('module', data) }
+
+// 更新模块
+export let updateModule = data => { return axios.put('module', data) }
+
+// 删除模块
+export let deleteModule = id => { return axios.delete('module', { data: { id: id } }) }
+
+// 查询模块列表
+export let getModuleList = data => { return axios.get('module', { params: data }) }

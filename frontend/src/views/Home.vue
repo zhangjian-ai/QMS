@@ -18,7 +18,7 @@
       <!-- 导航栏 -->
       <a-layout-header id="layout-header">
         <a-row id="header-row">
-          <a-col :span="4">
+          <a-col :span="1">
             <a-icon
               class="trigger"
               :type="collapsed ? 'menu-unfold' : 'menu-fold'"
@@ -26,11 +26,11 @@
             />
           </a-col>
           <a-col
-            :xs="{ span: 13, offset: 7}"
-            :md="{ span: 9, offset: 11}"
-            :lg="{ span: 7, offset: 13}"
-            :xl="{ span: 5, offset:15}"
-            :xxl="{ span: 3, offset: 17}"
+            :xs="{ span: 13, offset: 10}"
+            :md="{ span: 9, offset: 14}"
+            :lg="{ span: 7, offset: 16}"
+            :xl="{ span: 5, offset:18}"
+            :xxl="{ span: 3, offset: 20}"
           >
             <span>
               您好:
@@ -86,6 +86,7 @@ export default {
   padding: 0;
   display: flex;
   align-items: center;
+  text-align: center;
 }
 #layout-header .trigger {
   font-size: 1.5em;
