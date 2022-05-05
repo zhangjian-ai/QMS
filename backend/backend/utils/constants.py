@@ -1,7 +1,7 @@
 """
 @Project ：QMS 
 @File ：constants.py
-@Author ：张建
+@Author ：Seeker
 @Date ：2022/2/17 10:29 下午 
 """
 
@@ -20,7 +20,7 @@ MENU = [
         'items': [
             {'key': 'serviceList', 'content': '服务管理'},
             {'key': 'moduleList', 'content': '模块管理'},
-            {'key': 'apiList', 'content': '接口管理'}
+            {'key': 'interfaceList', 'content': '接口管理'}
         ]
     }
 ]

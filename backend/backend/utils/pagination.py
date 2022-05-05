@@ -1,7 +1,7 @@
 """
 @Project ：QMS 
 @File ：pagination.py
-@Author ：张建
+@Author ：Seeker
 @Date ：2022/3/16 9:47 下午 
 """
 

@@ -1,7 +1,7 @@
 """
 @Project ：QMS 
 @File ：urls.py
-@Author ：张建
+@Author ：Seeker
 @Date ：2022/3/8 8:38 下午 
 """
 

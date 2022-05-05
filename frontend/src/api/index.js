@@ -47,3 +47,18 @@ export let deleteModule = id => { return axios.delete('module', { data: { id: id
 
 // 查询模块列表
 export let getModuleList = data => { return axios.get('module', { params: data }) }
+
+// 获取所有模块
+export let getAllModule = () => { return axios.get('allModule') }
+
+// 创建接口
+export let createInterface = data => { return axios.post('interface', data) }
+
+// 更新接口
+export let updateInterface = data => { return axios.put('interface', data) }
+
+// 删除接口
+export let deleteInterface = id => { return axios.delete('interface', { data: { id: id } }) }
+
+// 查询接口列表
+export let getInterfaceList = data => { return axios.get('interface', { params: data }) }

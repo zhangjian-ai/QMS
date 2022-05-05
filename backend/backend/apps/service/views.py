@@ -74,7 +74,7 @@ class ServiceView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except ServiceModel.DoesNotExist:
-            return Response({'msg': "无法更新不存在的服务"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': "无效的服务ID"}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
             return Response({"msg": e.detail.__str__()}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,7 +101,7 @@ class ServiceView(APIView):
         return Response({'msg': '服务已删除'}, status=status.HTTP_200_OK)
 
 
-class AllServiceView(APIView):
+class ServiceListView(APIView):
     """
     查询所有服务列表
     """
@@ -184,7 +184,7 @@ class ModuleView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except ModuleModel.DoesNotExist:
-            return Response({'msg': "无法更新不存在的模块"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': "无效的模块ID"}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
             return Response({"msg": e.detail.__str__()}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -209,3 +209,113 @@ class ModuleView(APIView):
         module.delete()
 
         return Response({'msg': '模块已删除'}, status=status.HTTP_200_OK)
+
+
+class ModuleListView(APIView):
+    """
+    查询所有模块列表
+    """
+
+    def get(self, request):
+        """
+        默认只获取可用的模块
+        :param request:
+        :return:
+        """
+
+        query_set = ModuleModel.objects.filter(flag=True)
+        serializer = ModuleSerializer(instance=query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class InterfaceView(APIView):
+    """
+    接口视图
+    """
+
+    def get(self, request):
+        """
+        查询接口
+        :param request:
+        :return:
+        """
+        query_dict = request.query_params
+        keys = query_dict.keys()
+        data = {}
+
+        for key in keys:
+            if query_dict.get(key):
+                data[key] = query_dict.get(key)
+
+        page = int(data.pop('page', 1))
+        size = int(data.pop('page_size', 10))
+
+        if data.get('uri', None):
+            cls_name = data.pop('uri')
+            query_set = InterfaceModel.objects.filter(**data, uri__contains=cls_name)
+        else:
+            query_set = InterfaceModel.objects.filter(**data)
+
+        total = query_set.count()
+        serializer = InterfaceSerializer(instance=query_set[(page - 1) * size: page * size], many=True)
+        return Response({'total': total, 'data': serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """
+        创建接口
+        :param request:
+        :return:
+        """
+
+        data = request.data
+
+        try:
+            serializer = InterfaceSerializer(data=data, context={"user": request.user})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        except ValidationError as e:
+            return Response({"msg": e.detail.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'data': serializer.data, 'msg': '创建接口成功'}, status=status.HTTP_201_CREATED)
+
+    def put(self, request):
+        """
+        更新模块
+        :param request:
+        :return:
+        """
+        data = request.data
+        interface_id = data.pop('id')
+
+        try:
+            interface = InterfaceModel.objects.get(id=interface_id)
+
+            serializer = InterfaceSerializer(instance=interface, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        except InterfaceModel.DoesNotExist:
+            return Response({'msg': "无效的接口ID"}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({"msg": e.detail.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'data': serializer.data, 'msg': '更新接口成功'}, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        """
+        删除服务
+        :param request:
+        :return:
+        """
+        interface_id = request.data.get("id")
+
+        if not interface_id:
+            return Response({'msg': '无效的接口ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            interface = InterfaceModel.objects.get(id=interface_id)
+        except ModuleModel.DoesNotExist:
+            return Response({'msg': "无效的接口ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        interface.delete()
+
+        return Response({'msg': '接口已删除'}, status=status.HTTP_200_OK)

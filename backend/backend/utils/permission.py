@@ -1,7 +1,7 @@
 """
 @Project ：QMS 
 @File ：permission.py
-@Author ：张建
+@Author ：Seeker
 @Date ：2022/3/21 10:47 上午
 @Desc ：自定义权限统一采用权限组的方式分配控制，命名方式：服务名_操作1_操作2(均大写)，例如：SERVICE_CREATE_UPDATE_DELETE
 """

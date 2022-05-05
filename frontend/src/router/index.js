@@ -45,6 +45,14 @@ const routes = [
         meta: {
           title: "模块"
         }
+      },
+      {
+        path: "interfaceList",
+        name: "interfaceList",
+        component: () => import('../components/home/system/interfaceList.vue'),
+        meta: {
+          title: "接口"
+        }
       }
     ]
   }

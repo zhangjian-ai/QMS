@@ -4,23 +4,23 @@
     <div id="search-scope">
       <!-- 搜索表单 -->
       <a-form-model ref="searchForm" layout="inline" :model="searchForm">
-        <a-form-model-item label="模块名称" prop="name">
+        <a-form-model-item label="接口名称" prop="name">
           <a-input placeholder="精确匹配" v-model="searchForm.name"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="自动化类名" prop="cls_name">
+        <a-form-model-item label="URI" prop="uri">
           <a-input
             placeholder="模糊匹配"
-            v-model="searchForm.cls_name"
+            v-model="searchForm.uri"
           ></a-input>
         </a-form-model-item>
-        <a-form-model-item label="归属服务" prop="service">
+        <a-form-model-item label="归属模块" prop="module">
           <a-select
             placeholder="请选择"
-            v-model="searchForm.service"
+            v-model="searchForm.module"
             allowClear
           >
             <a-select-option
-              v-for="item in services"
+              v-for="item in modules"
               :value="item.id"
               :key="item.id"
               >{{ item.name }}</a-select-option
@@ -45,50 +45,50 @@
                 isCreate = true;
               }
             "
-            >创建模块</a-button
+            >新增接口</a-button
           >
         </a-col>
         <a-col :span="12" style="text-align: right">
-          <a-button type="primary" @click="queryModules()">查询</a-button>
+          <a-button type="primary" @click="queryInterfaces()">查询</a-button>
           <a-button @click="$refs.searchForm.resetFields()">重置</a-button>
         </a-col>
       </a-row>
       <!-- 创建模块弹窗 -->
       <a-modal
         id="modal"
-        title="创建模块"
+        title="新增接口"
         :visible="visible"
         @ok="handleOk"
         @cancel="handleCancel"
         width="30em"
       >
         <a-form-model
-          ref="moduleForm"
-          :model="moduleForm"
+          ref="interfaceForm"
+          :model="interfaceForm"
           :wrapperCol="{ span: 18, offset: 3 }"
         >
           <a-form-model-item prop="name" required>
-            <a-input v-model="moduleForm.name" placeholder="模块名称">
+            <a-input v-model="interfaceForm.name" placeholder="接口名称">
               <a-icon
                 slot="prefix"
-                type="medium"
+                type="italic"
                 style="color: rgba(0, 0, 0, 0.25)"
               />
             </a-input>
           </a-form-model-item>
-          <a-form-model-item prop="cls_name" required>
-            <a-input v-model="moduleForm.cls_name" placeholder="自动化类名">
+          <a-form-model-item prop="uri" required>
+            <a-input v-model="interfaceForm.uri" placeholder="URI">
               <a-icon
                 slot="prefix"
-                type="block"
+                type="shrink"
                 style="color: rgba(0, 0, 0, 0.25)"
               />
             </a-input>
           </a-form-model-item>
-          <a-form-model-item prop="service" required>
-            <a-select placeholder="归属服务" v-model="moduleForm.service">
+          <a-form-model-item prop="module" required>
+            <a-select placeholder="归属模块" v-model="interfaceForm.module">
               <a-select-option
-                v-for="item in services"
+                v-for="item in modules"
                 :value="item.id"
                 :key="item.id"
                 >{{ item.name }}</a-select-option
@@ -96,7 +96,7 @@
             </a-select>
           </a-form-model-item>
           <a-form-model-item prop="flag" required>
-            <a-select placeholder="启用状态" v-model="moduleForm.flag">
+            <a-select placeholder="启用状态" v-model="interfaceForm.flag">
               <a-select-option :value="1">启用</a-select-option>
               <a-select-option :value="0">禁用</a-select-option>
             </a-select>
@@ -105,7 +105,7 @@
       </a-modal>
       <!-- 删除服务弹窗 -->
       <a-modal
-        title="删除模块"
+        title="删除接口"
         :visible="delete_visible"
         @ok="handleDeleteOk"
         @cancel="delete_visible = false"
@@ -119,7 +119,7 @@
       <a-table
         :loading="loading"
         :columns="columns"
-        :data-source="moduleList"
+        :data-source="interfaceList"
         :rowKey="
           (record) => {
             return record.id;
@@ -128,7 +128,7 @@
         :pagination="pagination"
       >
         <template slot="action" slot-scope="record">
-          <a-button shape="circle" icon="edit" @click="updateModule(record)" />
+          <a-button shape="circle" icon="edit" @click="updateInterface(record)" />
           <a-button
             shape="circle"
             icon="delete"
@@ -137,7 +137,7 @@
             @click="
               () => {
                 delete_visible = true;
-                module_id = record.id;
+                interface_id = record.id;
               }
             "
           />
@@ -151,11 +151,11 @@
 </template>
 <script>
 import {
-  getAllService,
-  getModuleList,
-  createModule,
-  updateModule,
-  deleteModule,
+  getAllModule,
+  createInterface,
+  updateInterface,
+  deleteInterface,
+  getInterfaceList
 } from "@/api";
 import { pagination } from "@/components/base";
 export default {
@@ -164,27 +164,27 @@ export default {
       // 查询表单
       searchForm: {
         name: null,
-        cls_name: null,
-        service: undefined,
+        uri: null,
+        module: undefined,
         flag: undefined,
       },
 
-      // 可选服务
-      services: [],
+      // 可选模块
+      modules: [],
 
       // 创建模块弹窗
       visible: false,
       isCreate: true,
-      moduleForm: {
+      interfaceForm: {
         name: null,
-        cls_name: null,
-        service: undefined,
+        uri: null,
+        module: undefined,
         flag: undefined,
       },
 
       // 表格
       loading: false,
-      moduleList: [],
+      interfaceList: [],
       columns: [
         {
           title: "ID",
@@ -196,17 +196,17 @@ export default {
           title: "名称",
           dataIndex: "name",
           align: "center",
-          width: "15%",
+          width: "10%",
         },
         {
-          title: "自动化类名",
-          dataIndex: "cls_name",
+          title: "URI",
+          dataIndex: "uri",
           align: "center",
-          width: "15%",
+          width: "25%",
         },
         {
-          title: "归属服务",
-          dataIndex: "service_name",
+          title: "归属模块",
+          dataIndex: "module_name",
           align: "center",
           width: "15%",
         },
@@ -237,36 +237,36 @@ export default {
       ],
 
       // 分页
-      pagination: pagination(this.queryModules, ["20", "50", "100"]),
+      pagination: pagination(this.queryInterfaces, ["20", "50", "100"]),
 
-      // 删除模块变量
+      // 删除变量
       delete_visible: false,
-      module_id: null,
+      interface_id: null,
     };
   },
   methods: {
     // 弹窗确认回调
     handleOk() {
-      this.$refs.moduleForm.validate((valid) => {
+      this.$refs.interfaceForm.validate((valid) => {
         if (valid) {
           if (this.isCreate) {
-            createModule(this.moduleForm).then((res) => {
+            createInterface(this.interfaceForm).then((res) => {
               this.$message.success(res.data.msg);
               this.visible = false;
-              this.$refs.moduleForm.resetFields();
-              this.queryModules();
+              this.$refs.interfaceForm.resetFields();
+              this.queryInterfaces();
             });
           } else {
-            updateModule(this.moduleForm).then((res) => {
+            updateInterface(this.interfaceForm).then((res) => {
               this.$message.success(res.data.msg);
               this.visible = false;
-              this.moduleForm = {
+              this.interfaceForm = {
                 name: null,
-                cls_name: null,
-                service: undefined,
+                uri: null,
+                module: undefined,
                 flag: undefined,
               };
-              this.queryModules();
+              this.queryInterfaces();
             });
           }
         }
@@ -275,39 +275,39 @@ export default {
     // 弹窗取消回调
     handleCancel() {
       this.visible = false;
-      this.$refs.moduleForm.resetFields();
+      this.$refs.interfaceForm.resetFields();
     },
-    // 查询模块列表
-    queryModules() {
+    // 查询接口列表
+    queryInterfaces() {
       this.loading = true;
       this.searchForm.page = this.pagination.current;
       this.searchForm.page_size = this.pagination.pageSize;
-      getModuleList(this.searchForm).then((res) => {
-        this.moduleList = res.data.data;
+      getInterfaceList(this.searchForm).then((res) => {
+        this.interfaceList = res.data.data;
         this.pagination.total = res.data.total;
         this.loading = false;
       });
     },
-    // 更新模块
-    updateModule(row) {
+    // 更新接口
+    updateInterface(row) {
       this.visible = true;
       this.isCreate = false;
-      this.moduleForm = JSON.parse(JSON.stringify(row));
+      this.interfaceForm = JSON.parse(JSON.stringify(row));
     },
-    // 删除模块
+    // 删除接口
     handleDeleteOk() {
-      deleteModule(this.module_id).then((res) => {
+      deleteInterface(this.interface_id).then((res) => {
         this.$message.success(res.data.msg);
-        this.queryModules();
+        this.queryInterfaces();
       });
       this.delete_visible = false;
     },
   },
   created() {
-    getAllService().then((res) => {
-      this.services = res.data;
+    getAllModule().then((res) => {
+      this.modules = res.data;
     });
-    this.queryModules();
+    this.queryInterfaces();
   },
 };
 </script>
