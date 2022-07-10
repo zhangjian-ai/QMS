@@ -36,6 +36,12 @@ export let getServiceList = data => { return axios.get('service', { params: data
 // 获取所有服务
 export let getAllService = () => { return axios.get('allService') }
 
+// 获取用户最近使用的服务记录
+export let getLus = () => { return axios.get('lus') }
+
+// 更新用户最近使用的服务记录
+export let updateLus = service_id => { return axios.put('lus', { 'service_id': service_id }) }
+
 // 创建模块
 export let createModule = data => { return axios.post('module', data) }
 

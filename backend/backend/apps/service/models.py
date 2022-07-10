@@ -26,6 +26,23 @@ class ServiceModel(BaseModel):
         return self.name
 
 
+class LatestUseServiceModel(BaseModel):
+    """
+    最近使用服务模型
+    """
+
+    id = models.AutoField(verbose_name="ID", primary_key=True)
+    user_id = models.OneToOneField(UsersModel, verbose_name="用户ID", related_name="latest_use",
+                                   on_delete=models.CASCADE, null=False)
+    service_id = models.ForeignKey(ServiceModel, verbose_name="服务ID", related_name="latest_use",
+                                   on_delete=models.CASCADE, null=False)
+
+    class Meta:
+        db_table = "service_latest_use"
+        verbose_name = "最近使用的服务"
+        verbose_name_plural = verbose_name
+
+
 class ModuleModel(BaseModel):
     """
     系统模块模型

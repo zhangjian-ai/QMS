@@ -3,8 +3,10 @@ export let pagination = (callback, options = ["10", "20", "50", "100"]) => {
     let config = {
         total: 0,
         current: 1,
+        size: "small",
+        simple: false,
         pageSize: Number(options[0]),
-        showTotal: total => `共 ${total} 条数据`,
+        showTotal: total => `共 ${total} 条 `,
         showSizeChanger: true,
         showLessItems: true,
         pageSizeOptions: options,

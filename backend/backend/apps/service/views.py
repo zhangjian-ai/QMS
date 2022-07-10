@@ -118,6 +118,70 @@ class ServiceListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class LatestUseServiceView(APIView):
+    """
+    最近使用服务视图
+    """
+
+    def get(self, request):
+        """
+        获取登录用户最近一次使用的服务
+        首次获取时使用一个默认服务新建记录
+        :param request:
+        :return:
+        """
+
+        user = request.user
+
+        try:
+            query = LatestUseServiceModel.objects.get(user_id=user.id)
+        except LatestUseServiceModel.DoesNotExist:
+            # 如果当前无记录就新建一条
+            service = ServiceModel.objects.filter(flag=True)
+
+            try:
+                service_dict = ServiceSerializer(instance=service[0]).data
+            except IndexError:
+                return Response({'msg': "当前无可用服务", 'id': None, 'service': None})
+
+            LatestUseServiceModel.objects.create(user_id=user, service_id=service[0])
+        else:
+            service_dict = ServiceSerializer(instance=query.service_id).data
+
+        return Response({'id': service_dict['id'], 'name': service_dict['name']})
+
+    def put(self, request):
+        """
+        变更用户最近使用服务记录
+        :param request:
+        :return:
+        """
+
+        user = request.user
+        service_id = request.data.pop('service_id', None)
+
+        if not service_id:
+            return Response({'msg': '无效表单'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            query = LatestUseServiceModel.objects.get(user_id=user.id)
+        except LatestUseServiceModel.DoesNotExist:
+            # 如果当前无记录就新建一条
+            try:
+                service = ServiceModel.objects.get(id=service_id)
+                if not service.flag:
+                    return Response({'msg': "该服务已被禁用"}, status=status.HTTP_400_BAD_REQUEST)
+            except ServiceModel.DoesNotExist:
+                return Response({'msg': "无效的service_id"}, status=status.HTTP_400_BAD_REQUEST)
+
+            LatestUseServiceModel.objects.create(user_id=user, service_id=service)
+            service_dict = ServiceSerializer(instance=service)
+        else:
+            service_dict = ServiceSerializer(instance=query.service_id)
+
+        return Response({'id': service_dict['id'], 'name': service_dict['name']})
+
+
 class ModuleView(APIView):
     """
     模块视图

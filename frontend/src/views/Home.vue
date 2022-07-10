@@ -1,7 +1,12 @@
 <template>
   <a-layout id="home-layout">
     <!-- 侧边栏 -->
-    <a-layout-sider v-model="collapsed" :trigger="null" collapsible :collapsedWidth="0">
+    <a-layout-sider
+      v-model="collapsed"
+      :trigger="null"
+      collapsible
+      :collapsedWidth="0"
+    >
       <div class="logo"></div>
       <a-menu theme="dark" mode="inline" @click="changeView">
         <a-sub-menu v-for="sub_menu in menu" :key="sub_menu.key">
@@ -9,7 +14,9 @@
             <a-icon :type="sub_menu.icon" />
             <span>{{ sub_menu.content }}</span>
           </span>
-          <a-menu-item  v-for="item in sub_menu.items" :key="item.key">{{ item.content }}</a-menu-item>
+          <a-menu-item v-for="item in sub_menu.items" :key="item.key">{{
+            item.content
+          }}</a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
@@ -25,16 +32,36 @@
               @click="() => (collapsed = !collapsed)"
             />
           </a-col>
+          <a-col :span="3">
+            <a-row>
+              <span>服务:&nbsp;</span>
+              <!-- 动态绑定key值，以便在service更新时，重新渲染下拉框到DOM中。实现默认值的动态绑定 -->
+              <a-select
+                size="small"
+                :default-value="service.name"
+                :key="service.id"
+                style="width: 8em"
+              >
+                <a-select-option
+                  v-for="service in serviceList"
+                  :key="service.id"
+                  :value="service.id"
+                >
+                  {{ service.name }}
+                </a-select-option>
+              </a-select>
+            </a-row>
+          </a-col>
           <a-col
-            :xs="{ span: 13, offset: 10}"
-            :md="{ span: 9, offset: 14}"
-            :lg="{ span: 7, offset: 16}"
-            :xl="{ span: 5, offset:18}"
-            :xxl="{ span: 3, offset: 20}"
+            :xs="{ span: 13, offset: 7 }"
+            :md="{ span: 9, offset: 11 }"
+            :lg="{ span: 7, offset: 13 }"
+            :xl="{ span: 5, offset: 15 }"
+            :xxl="{ span: 3, offset: 17 }"
           >
             <span>
               您好:
-              <span style="color: #CC6600">{{ $store.state.nickname }}</span>
+              <span style="color: #cc6600">{{ $store.state.nickname }}</span>
             </span>
             <a-divider type="vertical" />
             <span>工作台</span>
@@ -51,7 +78,7 @@
   </a-layout>
 </template>
 <script>
-import { getMenu } from "@/api";
+import { getMenu, getLus, getAllService } from "@/api";
 
 export default {
   data() {
@@ -60,19 +87,31 @@ export default {
       collapsed: false,
 
       // 菜单配置
-      menu: []
+      menu: [],
+
+      // 导航栏服务列表
+      serviceList: [],
+
+      // 当前用户最近一次使用的服务
+      service: {},
     };
   },
   methods: {
     changeView(item) {
       this.$router.push({ name: item.key });
-    }
+    },
   },
   mounted() {
-    getMenu().then(res => {
+    getMenu().then((res) => {
       this.menu = res.data;
     });
-  }
+    getLus().then((res) => {
+      this.service = res.data;
+    });
+    getAllService().then((res) => {
+      this.serviceList = res.data;
+    });
+  },
 };
 </script>
 <style>

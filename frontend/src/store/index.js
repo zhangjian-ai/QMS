@@ -3,11 +3,13 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+
 export default new Vuex.Store({
   state: {
     // 登录token、nickname
     token: localStorage.token,
-    nickname: localStorage.nickname
+    nickname: localStorage.nickname,
+
   },
   mutations: {
     // 保存token
@@ -20,7 +22,6 @@ export default new Vuex.Store({
         state.nickname = ""
         localStorage.clear()
       }
-
     }
   },
   actions: {
